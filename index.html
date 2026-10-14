@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FASO VOICE - Aïcha</title>
+<style>
+body{background:#111;color:#fff;font-family:sans-serif;padding:20px;text-align:center}
+h1 span{color:#EF2B2D}
+textarea{width:100%;max-width:600px;height:120px;padding:15px;border-radius:10px;border:none;font-size:16px}
+.btn-parler{background:#EF2B2D;color:#fff;border:none;padding:15px 40px;font-size:18px;border-radius:30px;margin-top:20px;font-weight:bold}
+#status{margin-top:15px;color:#ffcc00}
+audio{margin-top:20px;width:100%;max-width:600px}
+</style>
+</head>
+<body>
+<div>
+<h1>🇧🇫 FASO <span>VOICE</span></h1>
+<p>Voix: <b>Aïcha - Burkina</b></p>
+<textarea id="text">Bienvenue sur Faso Voice! Ne yaba! I ni che! La voix du Burkina Faso qui parle notre langue!</textarea><br>
+<button class="btn-parler" onclick="parler()">🔊 PARLER AVEC AÏCHA</button>
+<p id="status"></p>
+<audio id="audio" controls style="display:none"></audio>
+</div>
+<script>
+async function parler(){
+ const t=document.getElementById('text').value;
+ const status=document.getElementById('status');
+ const audio=document.getElementById('audio');
+ if(!t){status.innerText='Ecris quelque chose!';return;}
+ status.innerText='Aïcha parle...';
+ audio.style.display='none';
+ try{
+   const r=await fetch('/api/tts',{
+     method:'POST',
+     headers:{'Content-Type':'application/json'},
+     body:JSON.stringify({text:t})
+   });
+   if(!r.ok){const e=await r.json();throw new Error(e.error||'Erreur serveur');}
+   const blob=await r.blob();
+   const url=URL.createObjectURL(blob);
+   audio.src=url;
+   audio.style.display='block';
+   audio.play();
+   status.innerText='✅ Aïcha a parlé!';
+ }catch(err){
+   status.innerText='❌ Erreur: '+err.message;
+   console.error(err);
+ }
+}
+</script>
+</body>
+</html>
